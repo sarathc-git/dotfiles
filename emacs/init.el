@@ -136,18 +136,11 @@
 ;;; Magit 
 (straight-use-package 'magit)
 
-(defhydra hydra-zoom (:color red)
-  "zoom"
-  ("g" text-scale-increase "in")
-  ("l" text-scale-decrease "out")
-  )
-
-
 (defhydra hydra-magit (:color red)
   "magit"  
   ("p" magit-push "magit-push" :column "actions")
   ("c" magit-commit "magit-commit" )
-  ("la" magit-log-all "magit-log-all" :column "status")
+  ("la" magit-log-all "magit-log-all --graph" :column "status")
   ("s" magit-status "magit-status")
   ("d" magit-diff "magit-diff")
   )
