@@ -47,6 +47,7 @@
 (tool-bar-mode -1)
 (menu-bar-mode -1)
 (scroll-bar-mode -1)
+(setq column-number-mode t)
 (setq
  make-backup-files nil
  auto-save-default nil
@@ -61,6 +62,10 @@
 (defalias 'yes-or-no-p 'y-or-n-p)
 (global-hl-line-mode t)
 (winner-mode 1)
+
+;;; Fonts
+(set-face-attribute 'default nil :font "Menlo" :height 200)
+
 
 ;;; Some initial key bindings
 (setq mac-left-option-modifier  'meta
@@ -130,3 +135,25 @@
 
 ;;; Magit 
 (straight-use-package 'magit)
+
+(defhydra hydra-zoom (:color red)
+  "zoom"
+  ("g" text-scale-increase "in")
+  ("l" text-scale-decrease "out")
+  )
+
+
+(defhydra hydra-magit (:color red)
+  "magit"  
+  ("p" magit-push "magit-push" :column "actions")
+  ("c" magit-commit "magit-commit" )
+  ("la" magit-log-all "magit-log-all" :column "status")
+  ("s" magit-status "magit-status")
+  ("d" magit-diff "magit-diff")
+  )
+
+(global-set-key (kbd "H-m") 'hydra-magit/body)
+
+;;; TODO Org - Roam, PDF Tools, Org Noter, Org Drill
+
+;;; LSP rest client 
