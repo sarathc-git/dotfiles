@@ -127,3 +127,6 @@
 (global-set-key (kbd "H-w") 'hydra-frames/body)
 
 ;;; TODO : Need to add org mode hydra menu.
+
+;;; Magit 
+(straight-use-package 'magit)
