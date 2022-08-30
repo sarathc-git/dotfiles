@@ -136,8 +136,8 @@
 
 (use-package which-key
   :config
-  (setq which-key-idle-delay 1.0)
-;;  (which-key-setup-minibufer)
+  (setq which-key-idle-delay 0.75)
+  (which-key-setup-minibuffer)
   (which-key-mode))
 
 ;;; TODO : Need to add org mode hydra menu.
@@ -162,8 +162,19 @@
 
 (use-package org
   :ensure org
+  :custom
+  (org-directory "~/orgs")
   )
 (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
+
+;;;; Mermaid
+;;; brew install  mermaid-cli
+(use-package ob-mermaid
+  :straight t
+  :custom
+  (setq ob-mermaid-cli-path "/Cellar/mermaid-cli/8.11.0/bin/mmdc"))
+
+
 
 (custom-theme-set-faces
    'user
@@ -204,3 +215,10 @@
 ;;; LSP rest client 
 
 
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (message "Emacs ready in %s with %d garbage collections."
+                     (format "%.2f seconds"
+                             (float-time
+                              (time-subtract after-init-time before-init-time)))
+                     gcs-done)))
