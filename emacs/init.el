@@ -166,6 +166,8 @@
 
 (use-package org
   :ensure org
+  :config
+  (setq org-confirm-babel-evaluate nil)
   :custom
   (org-directory "~/orgs")
   )
@@ -222,10 +224,14 @@
 	 ("H-n h" . org-id-get-create)
 	 ("H-n t" . org-roam-buffer-toggle)
 	 :map org-mode-map
-	 ("H-n c" . completion-at-point))
-
+	 ("H-n c" . completion-at-point)
+	 ("H-n r" . org-roam-ui-mode))
+ 
+  
   :config
   (org-roam-setup))
+
+
 
 ;;; Org Roam UI
 (use-package websocket
@@ -239,17 +245,21 @@
 
 
 ;;;; Org Hydra
-(defhydra hydra-insert-org (:color red)
+(defhydra hydra-org (:color red)
   "org"
-  ("is" (org-insert-structure-template "src")     "src block" )
+  ("is" (org-insert-structure-template "src")     "src block" :column "blocks")
   ("im" (org-insert-structure-template "src mermaid :file test.png") "mermaid" )
   )
-(global-set-key (kbd "s-o") 'hydra-insert-org/body)
+(global-set-key (kbd "s-o") 'hydra-org/body)
 	
 ;;; TODO Figure out a way to use google drive from emacs.
 
 ;;; LSP rest client 
 
+
+
+
+;;;;; Diagnostics for startup 
 
 (add-hook 'emacs-startup-hook 'perfReport)
 

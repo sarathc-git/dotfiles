@@ -11,4 +11,7 @@ flowchart LR
   fraction --> investment
 #+end_src
 
+#+RESULTS:
+[[file:investment.png]]
+
 
