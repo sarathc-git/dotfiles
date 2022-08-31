@@ -160,6 +160,10 @@
 
 ;;; TODO Org - Roam, PDF Tools, Org Noter, Org Drill
 
+(use-package exec-path-from-shell
+  :init
+  (exec-path-from-shell-initialize))
+
 (use-package org
   :ensure org
   :custom
@@ -167,14 +171,24 @@
   )
 (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
 
+
 ;;;; Mermaid
 ;;; brew install  mermaid-cli
 (use-package ob-mermaid
-  :straight t
-  :custom
-  (setq ob-mermaid-cli-path "/Cellar/mermaid-cli/8.11.0/bin/mmdc"))
+  :init
+  (define-key org-mode-map
+    (kbd "C-c C-c")
+    (lambda () (interactive)
+      (org-ctrl-c-ctrl-c)
+      (org-display-inline-images)
+      )
+    )
+  :hook ('org-babel-after-execute-hook 'org-redisplay-inline-images)
+  :config
+  (setq ob-mermaid-cli-path "/usr/local/bin/mmdc")
+  (org-display-inline-images))
 
-
+;;; If the path is not picked up from the shell, node does not execute.
 
 (custom-theme-set-faces
    'user

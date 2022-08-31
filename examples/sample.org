@@ -1,0 +1,33 @@
+* Introduction
+This is a sample org file with various capabilities added.
+
+* mermaid
+
+This is a sample
+#+begin_src mermaid :file investment.png
+flowchart LR
+  cloud[(source)] --> investment --> capital
+  capital --> output
+  output -- Revenue --> investment
+  fraction --> investment
+#+end_src
+
+#+RESULTS:
+[[file:investment.png]]
+
+
+#+begin_src mermaid :file sample.png
+sequenceDiagram
+    autonumber
+    Student->>Admin: Can I enrol this semester?
+    loop enrolmentCheck
+        Admin->>Admin: Check previous results
+    end
+    Note right of Admin: Exam results may <br> be delayed
+    Admin-->>Student: successful enrollment
+    Admin->>Professor: Assign student to tutor
+    Professor-->>Admin: Student is assigned
+
+#+end_src
+
+
