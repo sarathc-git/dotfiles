@@ -171,6 +171,7 @@
   )
 (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
 
+;;;; Org-Agenda, org-timeline
 
 ;;;; Mermaid
 ;;; brew install  mermaid-cli
@@ -183,7 +184,6 @@
       (org-display-inline-images)
       )
     )
-  :hook ('org-babel-after-execute-hook 'org-redisplay-inline-images)
   :config
   (setq ob-mermaid-cli-path "/usr/local/bin/mmdc")
   (org-display-inline-images))
@@ -205,6 +205,7 @@
    '(org-tag ((t (:inherit (shadow fixed-pitch) :weight bold :height 0.8))))
    '(org-verbatim ((t (:inherit (shadow fixed-pitch))))))
 
+;;;; Org Roam
 (use-package emacsql-sqlite3
   :straight t)
 
@@ -226,13 +227,37 @@
   :config
   (org-roam-setup))
 
+;;; Org Roam UI
+(use-package websocket
+  :after org-roam)
+(use-package org-roam-ui
+  :after org-roam
+  :config
+  (setq org-roam-ui-sync-theme t
+	org-roam-ui-follow t
+	org-roam-ui-update-on-save t))
+
+
+;;;; Org Hydra
+(defhydra hydra-insert-org (:color red)
+  "org"
+  ("is" (org-insert-structure-template "src")     "src block" )
+  ("im" (org-insert-structure-template "src mermaid :file test.png") "mermaid" )
+  )
+(global-set-key (kbd "s-o") 'hydra-insert-org/body)
+	
+;;; TODO Figure out a way to use google drive from emacs.
+
 ;;; LSP rest client 
 
 
-(add-hook 'emacs-startup-hook
-          (lambda ()
-            (message "Emacs ready in %s with %d garbage collections."
-                     (format "%.2f seconds"
-                             (float-time
-                              (time-subtract after-init-time before-init-time)))
-                     gcs-done)))
+(add-hook 'emacs-startup-hook 'perfReport)
+
+(defun perfReport ()
+  (message "Emacs ready in %s with %d garbage collections."
+	   (format "%.2f seconds"
+		   (float-time
+		    (time-subtract after-init-time before-init-time)))
+	   gcs-done))		  
+
+(perfReport)
