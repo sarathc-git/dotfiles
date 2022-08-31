@@ -4,14 +4,16 @@ This is a sample org file with various capabilities added.
 * mermaid
 
 This is a sample
-#+begin_src mermaid :file investment.png
-flowchart LR
-  cloud[(source)] --> investment --> capital
-  output -- Revenue --> investment
-  fraction --> investment
+#+begin_src mermaid :file test.png
+sequenceDiagram
+participant A
+participant B
+A -> B : Hello 
+
 #+end_src
 
 #+RESULTS:
-[[file:investment.png]]
+[[file:test.png]]
+
 
 
