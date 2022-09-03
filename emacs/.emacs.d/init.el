@@ -74,10 +74,67 @@
 
 (setq scroll-preserve-screen-position 1)
 
-(global-set-key (kbd "M-n") (kbd "C-v"))
-(global-set-key (kbd "M-p") (kbd "M-v"))
+;;;; Keyboard based movement configuration
+;;;; Characters 
+
+
+;;;; Words
+;;;;;  Backward: M-b, Forward: M-f
+;;;;;  Backward: M-<left>, Forward: M-<right>
+(global-set-key (kbd "M-<left>") 'backward-word)
+(global-set-key (kbd "M-<right>") 'forward-word)
+
+;;;; Lines
+;;;;;; Previous : C-p, Next : C-n
+;;;;;; Previous : <up>, Next : <down>
+(global-set-key (kbd "<up>") 'previous-line)
+(global-set-key (kbd "<down>") 'next-line)
+
+;;;;;; Start of : C-a, End of: C-e 
+;;;;;; Start of : S-<left>, End of: S-<right>
+(global-set-key (kbd "S-<left>") 'beginning-of-visual-line)
+(global-set-key (kbd "S-<right>") 'end-of-visual-line)
+
+;;;; Pages
+;;;;;; Scroll Up: M-v, Scroll Down : C-v
+;;;;;; Scroll Up: M-p, Scroll Down : M-n
+;;;;;; Scroll Up: M-<down>, Scroll Down : M-<up>
+
+(global-set-key (kbd "M-n") 'scroll-up)
+(global-set-key (kbd "M-p") 'scroll-down)
+
+(global-set-key (kbd "M-<down>") 'scroll-up)
+(global-set-key (kbd "M-<up>") 'scroll-down)
+
+;;;; Buffer
+;;;;;; Start of : S-<up>, End Of: S-<down>
+(global-set-key (kbd "S-<down>") 'end-of-buffer)
+(global-set-key (kbd "S-<up>") 'beginning-of-buffer)
+
 (global-set-key (kbd "H-f i") 'open-init-file)
 (global-set-key (kbd "H-b e") 'eval-buffer)
+
+(defhydra hydra-keyboard (:color red)
+  "Keyboard Movement"
+  ("M-<left>" backward-word "backward-word" :column "Words")
+  ("M-<right>" forward-word "forward-word")
+
+  ("<up>" previous-line "previous-line" :column "Lines")
+  ("<down>" next-line "next-line" :column "Lines")
+  ("S-<left>" beginning-of-visual-line "beginning-of-visual-line" :column "Lines")
+  ("S-<right>" end-of-visual-line "end-of-visual-line" :column "Lines")
+
+  ("M-<up>" scroll-down "scroll-down" :column "Pages")
+  ("M-<down>" scroll-up "scroll-up" :column "Pages")
+
+  ("S-<down>" beginning-of-buffer "beginning-of-buffer")
+  ("S-<down>" end-of-buffer "end-of-buffer" :column "Buffers")
+
+  )
+(global-set-key (kbd "H-k") 'hydra-keyboard/body)
+
+
+;;;;; End of movement config
 
 (global-set-key (kbd "<s-up>") 'shrink-window)
 (global-set-key (kbd "<s-down>") 'enlarge-window)
@@ -256,12 +313,28 @@
 
 ;;; LSP rest client 
 
+;;;;; Projectile setup and configuration.
+
+(use-package projectile
+  :ensure t
+  :init
+  (projectile-mode +1)
+  :bind (:map projectile-mode-map
+              ("C-c p" . projectile-command-map)))
+
+( defhydra hydra-project (:color red)
+  "Projectile"
+
+  )
+
+;;;;; End of projectice setup and configuration.
+
 
 
 (defun open-init-file ()
   "Open this very file."
   (interactive)
-  (find-file "~/.emacs.d/init.el"))
+  (find-file "~/dotfiles/emacs/.emacs.d/init.el"))
 
 ;;;;; Diagnostics for startup 
 
