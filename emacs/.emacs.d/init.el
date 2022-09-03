@@ -150,12 +150,17 @@
 ;;; Using hydra for some convenient key bindings.
 (straight-use-package 'hydra)
 
+;;;;; start of Zoom 
+(global-set-key (kbd "M-s-<up>") 'text-scale-increase)
+(global-set-key (kbd "M-s-<down>") 'text-scale-decrease)
+
 (defhydra hydra-zoom (:color red)
   "zoom"
   ("<up>" text-scale-increase "in")
   ("<down>" text-scale-decrease "out")
   )
 (global-set-key (kbd "H-z") 'hydra-zoom/body)
+;;;;; End of Zoom
 
 (straight-use-package 'windmove)
 
