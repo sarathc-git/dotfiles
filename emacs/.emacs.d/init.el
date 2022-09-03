@@ -258,6 +258,10 @@
 
 
 
+(defun open-init-file ()
+  "Open this very file."
+  (interactive)
+  (find-file "~/.emacs.d/init.el"))
 
 ;;;;; Diagnostics for startup 
 
