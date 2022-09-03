@@ -84,6 +84,9 @@
 (global-set-key (kbd "M-<left>") 'backward-word)
 (global-set-key (kbd "M-<right>") 'forward-word)
 
+;;; Using hydra for some convenient key bindings.
+(straight-use-package 'hydra)
+
 ;;;; Lines
 ;;;;;; Previous : C-p, Next : C-n
 ;;;;;; Previous : <up>, Next : <down>
@@ -147,8 +150,6 @@
 ;;;
 
 
-;;; Using hydra for some convenient key bindings.
-(straight-use-package 'hydra)
 
 ;;;;; start of Zoom 
 (global-set-key (kbd "M-s-<up>") 'text-scale-increase)
