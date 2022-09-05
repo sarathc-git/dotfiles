@@ -227,6 +227,53 @@
   :init
   (exec-path-from-shell-initialize))
 
+;;;;; Projectile setup and configuration.
+
+(use-package projectile
+  :ensure t
+  :init
+  (projectile-mode +1)
+  :bind (:map projectile-mode-map
+              ("C-c p" . projectile-command-map)))
+
+( defhydra hydra-project (:color red)
+  "Projectile"
+  
+  )
+
+;;;;; End of projectice setup and configuration.
+
+
+;;;; Completion framework - Helm
+
+(use-package helm
+  :config
+  (require 'helm-config)
+  :init
+  (helm-mode 1)
+  :bind
+  (("C-x C-f" . helm-find-files)
+   ("C-x b" . helm-mini)
+   ("C-x C-r" . helm-recentf)
+   :map helm-map
+   ("C-z"   . helm-select-action)
+   ("<tab>" . helm-execute-persistent-action))
+  )
+
+;;;; End of completion framewok - Helm  config
+
+
+;;;; Helm-projectile
+
+;; Helm Projectile
+(use-package helm-projectile
+:bind (("C-S-P" . helm-projectile-switch-project))
+:ensure t
+)
+
+
+
+
 (use-package org
   :ensure org
   :config
@@ -319,21 +366,33 @@
 
 ;;; LSP rest client 
 
-;;;;; Projectile setup and configuration.
 
-(use-package projectile
-  :ensure t
+;;; LSP Mode
+;;;;; 
+(use-package lsp-mode
   :init
-  (projectile-mode +1)
-  :bind (:map projectile-mode-map
-              ("C-c p" . projectile-command-map)))
+  ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
+  (setq lsp-keymap-prefix "C-c l")
+  :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
+         (python-mode . lsp)
+         ;; if you want which-key integration
+         (lsp-mode . lsp-enable-which-key-integration))
+  :commands lsp)
 
-( defhydra hydra-project (:color red)
-  "Projectile"
+;; optionally
+(use-package lsp-ui :commands lsp-ui-mode)
+;; if you are helm user
+(use-package helm-lsp :commands helm-lsp-workspace-symbol)
+;; if you are ivy user
+(use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
+(use-package lsp-treemacs :commands lsp-treemacs-errors-list)
 
-  )
 
-;;;;; End of projectice setup and configuration.
+
+;;; Typescript lsp-mode
+;;; npm i -g typescript-language-server; npm i -g typescript
+
+;;;; End of LSP Mode config
 
 
 
