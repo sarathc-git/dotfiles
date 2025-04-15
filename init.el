@@ -6,6 +6,13 @@
 (setq abbrev-file-name "~/.emacs.d/.abbrev")
 (setq auto-save-file-name-transforms `((".*" ,temporary-file-directory t)))
 
+(if init-file-debug
+    (setq use-package-verbose t
+          use-package-expand-minimally nil
+          use-package-compute-statistics t
+          debug-on-error t)
+  (setq use-package-verbose nil
+        use-package-expand-minimally t))
 
 ;; ### Package Infra
 ;; (require 'package)
@@ -41,6 +48,9 @@
 (setq straight-use-package-by-default t)
 ;; M-x straight-freeze-versions
 
+(use-package load-env-vars)
+(load-env-vars "~/.env")
+
 ;;; Clean startup
 (setq debug-on-error nil)
 (setq inhibit-startup-message t)
@@ -66,17 +76,22 @@
 ;;; Fonts
 (set-face-attribute 'default nil :font "Menlo" :height 200)
 
-
 ;;; Some initial key bindings
-(setq mac-left-option-modifier  'meta
-      mac-right-option-modifier 'hyper
-      mac-right-command-modifier 'super)
+(setq mac-left-command-modifier  'meta    ; M-
+      mac-left-option-modifier  'meta     ; M-
+      mac-right-option-modifier 'hyper    ; H- 
+      mac-right-command-modifier 'super)  ; s-
+
+;;; S- is configured in this config to help with some of the navigation commands below.
+
 
 (setq scroll-preserve-screen-position 1)
 
 ;;;; Keyboard based movement configuration
 ;;;; Characters 
 
+(use-package load-env-vars)
+(load-env-vars "~/.env")
 
 ;;;; Words
 ;;;;;  Backward: M-b, Forward: M-f
@@ -84,8 +99,6 @@
 (global-set-key (kbd "M-<left>") 'backward-word)
 (global-set-key (kbd "M-<right>") 'forward-word)
 
-;;; Using hydra for some convenient key bindings.
-(straight-use-package 'hydra)
 
 ;;;; Lines
 ;;;;;; Previous : C-p, Next : C-n
@@ -116,6 +129,10 @@
 
 (global-set-key (kbd "H-f i") 'open-init-file)
 (global-set-key (kbd "H-b e") 'eval-buffer)
+;;;;
+
+;;; Using hydra for some convenient key bindings.
+(straight-use-package 'hydra)
 
 (defhydra hydra-keyboard (:color red)
   "Keyboard Movement"
@@ -128,7 +145,7 @@
   ("S-<right>" end-of-visual-line "end-of-visual-line" :column "Lines")
 
   ("M-<up>" scroll-down "scroll-down" :column "Pages")
-  ("M-<down>" scroll-up "scroll-up" :column "Pages")
+  ("M-<down>" scroll-up "scroll-up" :column "Pages") 
 
   ("S-<down>" beginning-of-buffer "beginning-of-buffer")
   ("S-<down>" end-of-buffer "end-of-buffer" :column "Buffers")
@@ -190,12 +207,15 @@
          (windmove-down))  "split below and move")
   ("v" split-window-right "split right and stay")
   ("x" split-window-below "split below and stay")
-
-  ("d" delete-window :column "Miscellaneous")
   )
 (global-set-key (kbd "H-w") 'hydra-frames/body)
 
-(straight-use-package 'use-package)
+
+(use-package keycast
+  :config
+  (keycast-mode-line-mode)
+  (keycast-header-line-mode))
+(global-set-key (kbd "H-c") 'keycast-log-mode)
 
 (use-package which-key
   :config
@@ -203,7 +223,52 @@
   (which-key-setup-minibuffer)
   (which-key-mode))
 
+;;; Add completion capabilities with corfu, vertico, consult and orderless
+(use-package corfu
+  :straight t
+  :bind
+  (:map corfu-map
+        ;; unbind other corfu stuffs
+	("RET" . nil)
+	("TAB" . nil)
+	("[tab]" . nil)
+	("<tab>" . nil)
+        ;; bind corfu completion to C-enter
+	("C-<return>" . corfu-insert))
+)    ;; all your normal corfu stuffs)
+
+(use-package vertico
+  :init
+  (vertico-mode))
+
+(use-package consult)
+
+(use-package orderless
+  :ensure t
+  :custom
+  (completion-styles '(orderless basic))
+  (completion-category-overrides '((file (styles basic partial-completion)))))
+
+;;;;
+
+
+
 ;;; TODO : Need to add org mode hydra menu.
+
+;;; Add gptel to the configuration
+(use-package gptel
+  :init
+  (message (getenv "GEMINI_API_KEY"))
+  :straight t
+  :config
+  (setq gptel-log-level 'debug)
+  (setq gemini-key (getenv "GEMINI_API_KEY"))
+  (setq gptel-backend (gptel-make-gemini "Gemini" :key gemini-key :stream t))
+  (setq  gptel-model 'gemini-1.5-pro-latest)
+  )
+	
+;;;; end of gptel block 
+
 
 ;;; Magit 
 (straight-use-package 'magit)
@@ -229,76 +294,76 @@
 
 ;;;;; Projectile setup and configuration.
 
-(use-package projectile
-  :ensure t
-  :init
-  (projectile-mode +1)
-  :bind (:map projectile-mode-map
-              ("C-c p" . projectile-command-map)))
+;; (use-package projectile
+;;   :ensure t
+;;   :init
+;;   (projectile-mode +1)
+;;   :bind (:map projectile-mode-map
+;;               ("C-c p" . projectile-command-map)))
 
-( defhydra hydra-project (:color red)
-  "Projectile"
+;; ( defhydra hydra-project (:color red)
+;;   "Projectile"
   
-  )
+;;   )
 
 ;;;;; End of projectice setup and configuration.
 
 
 ;;;; Completion framework - Helm
 
-(use-package helm
-  :config
-  (require 'helm-config)
-  :init
-  (helm-mode 1)
-  :bind
-  (("C-x C-f" . helm-find-files)
-   ("C-x b" . helm-mini)
-   ("C-x C-r" . helm-recentf)
-   :map helm-map
-   ("C-z"   . helm-select-action)
-   ("<tab>" . helm-execute-persistent-action))
-  )
+;; (use-package helm
+;;   :config
+;;   (require 'helm-config)
+;;   :init
+;;   (helm-mode 1)
+;;   :bind
+;;   (("C-x C-f" . helm-find-files)
+;;    ("C-x b" . helm-mini)
+;;    ("C-x C-r" . helm-recentf)
+;;    :map helm-map
+;;    ("C-z"   . helm-select-action)
+;;    ("<tab>" . helm-execute-persistent-action))
+;;   )
 
-;;;; End of completion framewok - Helm  config
-
-
-;;;; Helm-projectile
-
-;; Helm Projectile
-(use-package helm-projectile
-:bind (("C-S-P" . helm-projectile-switch-project))
-:ensure t
-)
+;; ;;;; End of completion framewok - Helm  config
 
 
+;; ;;;; Helm-projectile
+
+;; ;; Helm Projectile
+;; (use-package helm-projectile
+;; :bind (("C-S-P" . helm-projectile-switch-project))
+;; :ensure t
+;; )
 
 
-(use-package org
-  :ensure org
-  :config
-  (setq org-confirm-babel-evaluate nil)
-  :custom
-  (org-directory "~/orgs")
-  )
-(add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
+
+
+;; (use-package org
+;;   :ensure org
+;;   :config
+;;   (setq org-confirm-babel-evaluate nil)
+;;   :custom
+;;   (org-directory "~/orgs")
+;;   )
+;; (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
 
 ;;;; Org-Agenda, org-timeline
 
 ;;;; Mermaid
 ;;; brew install  mermaid-cli
-(use-package ob-mermaid
-  :init
-  (define-key org-mode-map
-    (kbd "C-c C-c")
-    (lambda () (interactive)
-      (org-ctrl-c-ctrl-c)
-      (org-display-inline-images)
-      )
-    )
-  :config
-  (setq ob-mermaid-cli-path "/usr/local/bin/mmdc")
-  (org-display-inline-images))
+;; (use-package ob-mermaid
+;;   :init
+;;   (define-key org-mode-map
+;;     (kbd "C-c C-c")
+;;     (lambda () (interactive)
+;;       (org-ctrl-c-ctrl-c)
+;;       (org-display-inline-images)
+;;       )
+;;     )
+;;   :config
+;;   (setq ob-mermaid-cli-path "/usr/local/bin/mmdc")
+;;   (org-display-inline-images))
 
 ;;; If the path is not picked up from the shell, node does not execute.
 
@@ -318,49 +383,49 @@
    '(org-verbatim ((t (:inherit (shadow fixed-pitch))))))
 
 ;;;; Org Roam
-(use-package emacsql-sqlite3
-  :straight t)
+;; (use-package emacsql-sqlite3
+;;   :straight t)
 
-(use-package org-roam
-  :straight t
-  :custom
-  (org-roam-directory "~/orgs/roam")
-  (org-roam-completion-everywhere t)
-  (org-roam-database-connector 'sqlite3)
-  (org-tags-column 10)
-  :bind (("H-n b" . org-roam-buffer-toggle)
-	 ("H-n f" . org-roam-node-find)
-	 ("H-n i" . org-roam-node-insert)
-	 ("H-n h" . org-id-get-create)
-	 ("H-n t" . org-roam-buffer-toggle)
-	 :map org-mode-map
-	 ("H-n c" . completion-at-point)
-	 ("H-n r" . org-roam-ui-mode))
+;; (use-package org-roam
+;;   :straight t
+;;   :custom
+;;   (org-roam-directory "~/orgs/roam")
+;;   (org-roam-completion-everywhere t)
+;;   (org-roam-database-connector 'sqlite3)
+;;   (org-tags-column 10)
+;;   :bind (("H-n b" . org-roam-buffer-toggle)
+;; 	 ("H-n f" . org-roam-node-find)
+;; 	 ("H-n i" . org-roam-node-insert)
+;; 	 ("H-n h" . org-id-get-create)
+;; 	 ("H-n t" . org-roam-buffer-toggle)
+;; 	 :map org-mode-map
+;; 	 ("H-n c" . completion-at-point)
+;; 	 ("H-n r" . org-roam-ui-mode))
  
   
-  :config
-  (org-roam-setup))
+;;   :config
+;;   (org-roam-setup))
 
 
 
-;;; Org Roam UI
-(use-package websocket
-  :after org-roam)
-(use-package org-roam-ui
-  :after org-roam
-  :config
-  (setq org-roam-ui-sync-theme t
-	org-roam-ui-follow t
-	org-roam-ui-update-on-save t))
+;; ;;; Org Roam UI
+;; (use-package websocket
+;;   :after org-roam)
+;; (use-package org-roam-ui
+;;   :after org-roam
+;;   :config
+;;   (setq org-roam-ui-sync-theme t
+;; 	org-roam-ui-follow t
+;; 	org-roam-ui-update-on-save t))
 
 
-;;;; Org Hydra
-(defhydra hydra-org (:color red)
-  "org"
-  ("is" (org-insert-structure-template "src")     "src block" :column "blocks")
-  ("im" (org-insert-structure-template "src mermaid :file test.png") "mermaid" )
-  )
-(global-set-key (kbd "s-o") 'hydra-org/body)
+;; ;;;; Org Hydra
+;; (defhydra hydra-org (:color red)
+;;   "org"
+;;   ("is" (org-insert-structure-template "src")     "src block" :column "blocks")
+;;   ("im" (org-insert-structure-template "src mermaid :file test.png") "mermaid" )
+;;   )
+;; (global-set-key (kbd "s-o") 'hydra-org/body)
 	
 ;;; TODO Figure out a way to use google drive from emacs.
 
@@ -369,37 +434,40 @@
 
 ;;; LSP Mode
 ;;;;; 
-(use-package lsp-mode
-  :init
-  ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
-  (setq lsp-keymap-prefix "C-c l")
-  :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
-         (python-mode . lsp)
-         ;; if you want which-key integration
-         (lsp-mode . lsp-enable-which-key-integration))
-  :commands lsp)
+;; (use-package lsp-mode
+;;   :init
+;;   ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
+;;   (setq lsp-keymap-prefix "C-c l")
+;;   :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
+;;          (python-mode . lsp)
+;;          ;; if you want which-key integration
+;;          (lsp-mode . lsp-enable-which-key-integration))
+;;   :commands lsp)
 
-;; optionally
-(use-package lsp-ui :commands lsp-ui-mode)
-;; if you are helm user
-(use-package helm-lsp :commands helm-lsp-workspace-symbol)
-;; if you are ivy user
-(use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
-(use-package lsp-treemacs :commands lsp-treemacs-errors-list)
-
-
-
-;;; Typescript lsp-mode
-;;; npm i -g typescript-language-server; npm i -g typescript
-
-;;;; End of LSP Mode config
+;; ;; optionally
+;; (use-package lsp-ui :commands lsp-ui-mode)
+;; ;; if you are helm user
+;; (use-package helm-lsp :commands helm-lsp-workspace-symbol)
+;; ;; if you are ivy user
+;; (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
+;; (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
 
 
+
+;; ;;; Typescript lsp-mode
+;; ;;; npm i -g typescript-language-server; npm i -g typescript
+
+;; ;;;; End of LSP Mode config
+
+(defun test-all-getenv-inherited ()
+  (interactive)
+  (let* ((variable-list (list "PATH" "HOME" "USER" "SHELL" "EDITOR" "LOGNAME" "LANG"))) ; Add or remove variables as needed
+    (mapcar #'test-getenv-inherited variable-list)))
 
 (defun open-init-file ()
   "Open this very file."
   (interactive)
-  (find-file "~/dotfiles/emacs/.emacs.d/init.el"))
+  (find-file user-init-file))
 
 ;;;;; Diagnostics for startup 
 
