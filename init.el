@@ -241,7 +241,13 @@
   :init
   (vertico-mode))
 
+
+(use-package marginalia
+  :init
+  (marginalia-mode))
+
 (use-package consult)
+ 
 
 (use-package orderless
   :ensure t
@@ -250,8 +256,6 @@
   (completion-category-overrides '((file (styles basic partial-completion)))))
 
 ;;;;
-
-
 
 ;;; TODO : Need to add org mode hydra menu.
 
