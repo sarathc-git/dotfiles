@@ -213,8 +213,10 @@
 
 (use-package keycast
   :config
-  (keycast-mode-line-mode)
-  (keycast-header-line-mode))
+  (keycast-tab-bar-mode)
+  ;;  (keycast-mode-line-mode)
+  ;;  (keycast-header-line-mode)
+  )
 (global-set-key (kbd "H-c") 'keycast-log-mode)
 
 (use-package which-key
@@ -295,6 +297,13 @@
 (use-package exec-path-from-shell
   :init
   (exec-path-from-shell-initialize))
+
+
+;;; Some convenient key bindings
+(use-package recentf
+  :init
+  (global-set-key (kbd "C-x r") 'recentf-open))
+
 
 ;;;;; Projectile setup and configuration.
 
@@ -435,26 +444,98 @@
 
 ;;; LSP rest client 
 
+(use-package company
+  :ensure t
+  :config 
+  ;; don't add any dely before trying to complete thing being typed
+  ;; the call/response to gopls is asynchronous so this should have little
+  ;; to no affect on edit latency
+  (setq company-idle-delay 0)
+  ;; start completing after a single character instead of 3
+  (setq company-minimum-prefix-length 1)
+  ;; align fields in completions
+  (setq company-tooltip-align-annotations t)
+  
+  )
 
+(use-package company-box
+  :hook (company-mode . company-box-mode))
+
+
+(use-package company-lsp
+  :ensure t
+  :commands company-lsp)
+
+;; Not able to add the pyenv that is active to the modeline. 
+
+;; (use-package pyvenv
+;;   :diminish
+;;   :config
+;;   (setq pyvenv-mode-line-indicator
+;; 	'(pyvenv-virtual-env-name ("[venv:" pyvenv-virtual-env-name "] ")))
+  
+;;   (pyvenv-mode +1))
+
+
+(use-package python-mode
+  :ensure t
+  :mode (
+	 ("\\.py\\'" . python-mode))
+  :custom
+  (python-shell-interpreter "python3"))
+
+
+(straight-use-package 'lsp-mode)
 ;;; LSP Mode
 ;;;;; 
-;; (use-package lsp-mode
-;;   :init
-;;   ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
-;;   (setq lsp-keymap-prefix "C-c l")
-;;   :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
-;;          (python-mode . lsp)
-;;          ;; if you want which-key integration
-;;          (lsp-mode . lsp-enable-which-key-integration))
-;;   :commands lsp)
+(use-package lsp-mode
+  :init
+  (setq lsp-keymap-prefix "C-c l")
+  :hook (
+         (python-mode . lsp)
+	 (go-mode . lsp)
+	 
+	 (lsp-mode . lsp-enable-which-key-integration))
+  :commands lsp)
+
+(straight-use-package 'envrc)
+(envrc-global-mode)
+
+
+(use-package go-mode
+  :ensure t
+  :bind (
+	 ("C-c C-j" . lsp-find-definition)
+	 ("C-c C-d" . lsp-describe-thing-at-point)
+	 )
+  
+  :hook (
+	 (go-mode . lsp-deferred)
+	 (before-save . lsp-fomat-buffer)
+	 (before-save . lsp-organize-imports)
+	 ))
+
+  
+
+  
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; (use-package gopls-config		   ;;
+;;  :ensure t			   ;;
+;;  :hook (go-mode . gopls-mode))    ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 
 ;; ;; optionally
-;; (use-package lsp-ui :commands lsp-ui-mode)
+(use-package lsp-ui
+  :ensure t
+  :straight t
+  :commands lsp-ui-mode
+  )
 ;; ;; if you are helm user
 ;; (use-package helm-lsp :commands helm-lsp-workspace-symbol)
 ;; ;; if you are ivy user
 ;; (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
-;; (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
+(use-package lsp-treemacs :commands lsp-treemacs-errors-list)
 
 
 
