@@ -275,6 +275,16 @@
 	
 ;;;; end of gptel block 
 
+(use-package git-gutter
+  :ensure t)
+
+(use-package git-gutter-fringe
+  :ensure t
+  :config
+  (define-fringe-bitmap 'git-gutter-fr:added [224] nil nil '(center repeated))
+  (define-fringe-bitmap 'git-gutter-fr:modified [224] nil nil '(center repeated))
+  (define-fringe-bitmap 'git-gutter-fr:deleted [128 192 224 240] nil nil 'bottom)
+)
 
 ;;; Magit 
 (straight-use-package 'magit)
